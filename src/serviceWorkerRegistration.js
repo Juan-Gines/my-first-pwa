@@ -10,6 +10,8 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://cra.link/PWA
 
+import axios from "axios";
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     // [::1] is the IPv6 localhost address.
@@ -17,6 +19,13 @@ const isLocalhost = Boolean(
     // 127.0.0.0/8 are considered localhost for IPv4.
     window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
+
+// Guardamos la vapid keys generada con web-push
+const vapidkeys = {
+	publickey:
+		'BHMmNWbYjqGuMC2hYSfnJKiP8QR2d6YFxRPo89bCSXcnpbBVI5c5iBEgWxmMC85EPo2dIshhmkSyO0JZHqLk2mw',
+  privatekey: 'nJbqt3MtQznUdrj9fBVg_LhzqvHZg1ygxJMEs52tiQ4'
+};
 
 export function register(config) {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
@@ -56,6 +65,19 @@ function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
+      // Modificamos el registration y obtenemos suscripcion
+      // Y le decimos que se suscriba utilizando las vapid keys
+      registration.pushManager.getSubscription()
+        .then(async (sub)=> {
+          const pushSubscription = await registration.pushManager.subscribe({
+						userVisibleOnly: true,
+						applicationServerKey: vapidkeys.publickey,
+					});
+          // Aquí se lo enviamos al servidor
+          await axios.post('http://localhost:8000/subscription',{
+            pushSubscription
+          })
+        })
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {

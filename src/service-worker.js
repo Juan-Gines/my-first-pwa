@@ -26,57 +26,67 @@ precacheAndRoute(self.__WB_MANIFEST);
 // https://developers.google.com/web/fundamentals/architecture/app-shell
 const fileExtensionRegexp = new RegExp('/[^/?]+\\.[^/]+$');
 registerRoute(
-  // Return false to exempt requests from being fulfilled by index.html.
-  ({ request, url }) => {
-    // If this isn't a navigation, skip.
-    if (request.mode !== 'navigate') {
-      return false;
-    } // If this is a URL that starts with /_, skip.
+	// Return false to exempt requests from being fulfilled by index.html.
+	({ request, url }) => {
+		// If this isn't a navigation, skip.
+		if (request.mode !== 'navigate') {
+			return false;
+		} // If this is a URL that starts with /_, skip.
 
-    if (url.pathname.startsWith('/_')) {
-      return false;
-    } // If this looks like a URL for a resource, because it contains // a file extension, skip.
+		if (url.pathname.startsWith('/_')) {
+			return false;
+		} // If this looks like a URL for a resource, because it contains // a file extension, skip.
 
-    if (url.pathname.match(fileExtensionRegexp)) {
-      return false;
-    } // Return true to signal that we want to use the handler.
+		if (url.pathname.match(fileExtensionRegexp)) {
+			return false;
+		} // Return true to signal that we want to use the handler.
 
-    return true;
-  },
-  createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
+		return true;
+	},
+	createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
 );
 
 // An example runtime caching route for requests that aren't handled by the
 // precache, in this case same-origin .png requests like those from in public/
 registerRoute(
-  // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
-  new StaleWhileRevalidate({
-    cacheName: 'images',
-    plugins: [
-      // Ensure that once this runtime cache reaches a maximum size the
-      // least-recently used images are removed.
-      new ExpirationPlugin({ maxEntries: 50 }),
-    ],
-  })
+	// Add in any other file extensions or routing criteria as needed.
+	({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
+	new StaleWhileRevalidate({
+		cacheName: 'images',
+		plugins: [
+			// Ensure that once this runtime cache reaches a maximum size the
+			// least-recently used images are removed.
+			new ExpirationPlugin({ maxEntries: 50 }),
+		],
+	})
 );
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+	if (event.data && event.data.type === 'SKIP_WAITING') {
+		self.skipWaiting();
+	}
 });
 
 // Any other custom service worker logic can go here.
 // Aquí vamos a poner todo nuestro código custom
-const version = "app-compra-v5";
+// const version = "app-compra-v5"; // Esto lo utilizamos para forzar nueva versión
 
-self.addEventListener('install', (event)=>{
-  console.log(`Instalando versión ${version}`)
-})
+self.addEventListener('install', (event) => {
+	console.log(`Instalando una nueva versión...`);
+	self.registration.showNotification('Nueva versión de la super App!', {
+		body: 'Instala esta nueva versión',
+	});
+});
 
-self.addEventListener('activate', (event)=>{
-  console.log(`Activando versión ${version}`)
-})
+self.addEventListener('activate', (event) => {
+	console.log(`¡Activada la nueva versión!`);
+});
+
+// Listener para escuchar cuando nos lleguen notificaciones del servidor
+self.addEventListener('push', (event) => {
+	console.log(event.data)
+	const { title, message } = event.data.json();
+	self.registration.showNotification(title, { body: message });
+});

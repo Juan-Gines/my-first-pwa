@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import Notificaciones from './components/forms/Notificaciones';
 
 function App() {
 	const [newItem, setNewItem] = useState('');
@@ -31,7 +32,9 @@ function App() {
 						<li key={key}>{item}</li>
 					))}
 				</ul>
+				<Notificaciones />
 			</header>
+			<section></section>
 		</div>
 	);
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import Notificaciones from './components/forms/Notificaciones';
+import UpdateSW from './sw/UpdateSW';
 
 function App() {
 	const [newItem, setNewItem] = useState('');
@@ -33,6 +34,7 @@ function App() {
 					))}
 				</ul>
 				<Notificaciones />
+				<UpdateSW />
 			</header>
 			<section></section>
 		</div>

@@ -71,12 +71,12 @@ self.addEventListener('message', (event) => {
 
 // Any other custom service worker logic can go here.
 // Aquí vamos a poner todo nuestro código custom
-// const version = "app-compra-v5"; // Esto lo utilizamos para forzar nueva versión
+// const version = "app-compra-v5"; // Esto lo utilizamos para forzar nueva versión 
 
 self.addEventListener('install', (event) => {
 	console.log(`Instalando una nueva versión...`);
 	self.registration.showNotification('Nueva versión de la super App!', {
-		body: 'Instala esta nueva versión',
+		body: 'Instala esta nueva versión ahora',
 	});
 });
 
@@ -86,7 +86,6 @@ self.addEventListener('activate', (event) => {
 
 // Listener para escuchar cuando nos lleguen notificaciones del servidor
 self.addEventListener('push', (event) => {
-	console.log(event.data)
-	const { title, message } = event.data.json();
+	const { title, message } = event.data.json();	
 	self.registration.showNotification(title, { body: message });
 });

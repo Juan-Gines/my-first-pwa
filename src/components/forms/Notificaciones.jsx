@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {  useRef } from 'react';
 
 import axios from 'axios';
 
@@ -6,13 +6,15 @@ const Notificaciones = () => {
 	const titleRef = useRef('');
 	const messageRef = useRef('');
 
-	const onSubmit = async (e) => {
+	const onSubmit = (e) => {
 		e.preventDefault();
 		const newNotification = {
 			title: titleRef.current.value,
 			message: messageRef.current.value,
 		};
-		await axios.post('http://localhost:8000/notification', newNotification);
+		axios.post('http://localhost:8000/notification', newNotification)
+			.then(r => console.log(r))
+			.catch(e => console.log(e));
 	};
 	return (
 		<form onSubmit={onSubmit}>
